@@ -21,14 +21,37 @@ public class Proxy extends ProxyServlet {
 
     @Override
     protected String rewriteTarget(final HttpServletRequest request) {
-	
-	URI rewrittenURI = URI.create(DEFAULT_PROXYTO_OTHER + request.getRequestURI() + "?" + request.getQueryString());
-	
+	final String proxyTo = chooseDestination(request);
+	final URI rewrittenURI = createRewrittenURI(request, proxyTo);
+
 	if (validateDestination(rewrittenURI.getHost(), rewrittenURI.getPort())) {
 	    return rewrittenURI.toString();
 	}
-	
+
 	return null;
+    }
+
+    protected URI createRewrittenURI(final HttpServletRequest request, final String proxyTo) {
+	String queryString = request.getQueryString();
+
+	StringBuilder builder = new StringBuilder(proxyTo);
+
+	builder.append(request.getRequestURI()).append("?").append(queryString);
+
+	URI uri = URI.create(builder.toString());
+
+	return uri;
+    }
+
+    protected String chooseDestination(final HttpServletRequest request) {
+	String userAgent = request.getHeader("user-agent");
+
+	String regex = "Mozilla(.*)Chrome([0-9]*).*Safari\\/([0-9]*\\.([0-9])*)$";
+
+	if (userAgent.matches(regex))
+	    return DEFAULT_PROXYTO_CHROME;
+
+	return DEFAULT_PROXYTO_OTHER;
     }
 
 }
