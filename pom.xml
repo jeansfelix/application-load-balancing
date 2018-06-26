@@ -8,14 +8,26 @@
 	<version>1.0</version>
 	<name>application-load-balancing</name>
 
+	<properties>
+		<jetty-version>9.4.4.v20170414</jetty-version>
+		<junit-version>4.12</junit-version>
+	</properties>
 
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-servlet -->
 		<dependency>
-		    <groupId>org.eclipse.jetty</groupId>
-		    <artifactId>jetty-servlet</artifactId>
-		    <version>9.4.4.v20170414</version>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlet</artifactId>
+			<version>${jetty-version}</version>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-proxy -->
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-proxy</artifactId>
+			<version>${jetty-version}</version>
+		</dependency>
+		
 	</dependencies>
 
 </project>
