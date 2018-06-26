@@ -9,6 +9,8 @@ import org.eclipse.jetty.proxy.ProxyServlet;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 public class Proxy extends ProxyServlet {
+    private static final long serialVersionUID = 8881768845514682064L;
+    
     private static String DEFAULT_PROXYTO_CHROME = "http://localhost:8080";
     private static String DEFAULT_PROXYTO_OTHER = "http://localhost:8081";
 
@@ -32,10 +34,13 @@ public class Proxy extends ProxyServlet {
     }
 
     protected URI createRewrittenURI(final HttpServletRequest request, final String proxyTo) {
-	String queryString = request.getQueryString();
 	StringBuilder builder = new StringBuilder(proxyTo);
 	
-	builder.append(request.getRequestURI()).append("?").append(queryString);
+	builder.append(request.getRequestURI());
+
+	String queryString = request.getQueryString();
+	if (queryString != null) 
+	    builder.append("?").append(queryString);
 	
 	URI uri = URI.create(builder.toString());
 
@@ -45,9 +50,9 @@ public class Proxy extends ProxyServlet {
     protected String chooseDestination(final HttpServletRequest request) {
 	String userAgent = request.getHeader("user-agent");
 
-	String regex = "Mozilla(.*)Chrome([0-9]*).*Safari\\/([0-9]*\\.([0-9])*)$";
+	String regexChromeBrowser = "Mozilla(.*)Chrome([0-9]*).*Safari\\/([0-9]*\\.([0-9])*)$";
 
-	if (userAgent.matches(regex))
+	if (userAgent.matches(regexChromeBrowser))
 	    return DEFAULT_PROXYTO_CHROME;
 
 	return DEFAULT_PROXYTO_OTHER;

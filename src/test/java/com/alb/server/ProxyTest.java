@@ -1,5 +1,7 @@
 package com.alb.server;
 
+import java.net.URI;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Assert;
@@ -54,6 +56,44 @@ public class ProxyTest {
 	String proxyDestination = proxy.chooseDestination(httpServletRequest);
 	
 	Assert.assertEquals(expectedChromeServer, proxyDestination);
+    }
+    
+    @Test
+    public void testCreateRewrittenURI_RequestWithPathAndQueryToProxyFromChrome_MustBeReturnURIToChromeServerCorrectly() throws Exception {
+	String chromeServer = "http://localhost:8080";
+	
+	HttpServletRequest httpServletRequest = Mockito.mock(HttpServletRequest.class);
+
+	String queryString = "name=John";
+	Mockito.when(httpServletRequest.getQueryString()).thenReturn(queryString);
+	
+	String requestURI = "/greeting";
+	Mockito.when(httpServletRequest.getRequestURI()).thenReturn(requestURI);
+	
+	Proxy proxy = new Proxy();
+	
+	URI uri = proxy.createRewrittenURI(httpServletRequest, chromeServer);
+	
+	Assert.assertEquals("http://localhost:8080/greeting?name=John", uri.toString());
+    }
+    
+    @Test
+    public void testCreateRewrittenURI_RequestWithoutPathAndQueryGreetingToProxyFromChrome_MustBeReturnURIToChromeServerCorrectly() throws Exception {
+	String chromeServer = "http://localhost:8080";
+	
+	HttpServletRequest httpServletRequest = Mockito.mock(HttpServletRequest.class);
+
+	String queryString = null;
+	Mockito.when(httpServletRequest.getQueryString()).thenReturn(queryString);
+	
+	String requestURI = "";
+	Mockito.when(httpServletRequest.getRequestURI()).thenReturn(requestURI);
+	
+	Proxy proxy = new Proxy();
+	
+	URI uri = proxy.createRewrittenURI(httpServletRequest, chromeServer);
+	
+	Assert.assertEquals("http://localhost:8080", uri.toString());
     }
     
     
