@@ -3,6 +3,7 @@ package com.alb.server;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -16,24 +17,38 @@ public class Application {
     private static int DEFAULT_HTTPS_SERVER_PORT = 8443;
 
     public static void main(String... args) throws Exception {
-	Arguments arguments = treatArguments(args);
-	ProxyServer.initServer(arguments.getPort(), arguments.getServerChrome(), arguments.getServerOther());
+	try {
+	    Arguments arguments = treatArguments(args);
+	    
+	    if (arguments != null) {
+		ProxyServer.initServer(arguments.getPort(), arguments.getServerChrome(), arguments.getServerOther());
+	    }
+	} catch (ParseException e) {
+	    e.printStackTrace();
+	}
     }
 
-    private static Arguments treatArguments(String[] args) {
+    private static Arguments treatArguments(String[] args) throws ParseException {
 	Options options = new Options();
-
+	
+	options.addOption("help", "help menu");
 	options.addOption("p", ARG_PORT, true, "server proxy port. Default: 8443");
 	options.addOption("sc", ARG_SERVER_CHROME, true, "server for chrome requests. Default: localhost:8080");
 	options.addOption("so", ARG_SERVER_OTHER, true, "server for others requests. Default: localhost:8081");
 
 	CommandLineParser parser = new DefaultParser();
-
-	Arguments arguments = new Arguments();
+	HelpFormatter formatter = new HelpFormatter();
 
 	try {
 	    CommandLine line = parser.parse(options, args);
 
+	    if (line.hasOption("help")) {
+		formatter.printHelp("help", options);
+		return null;
+	    }
+
+	    Arguments arguments = new Arguments();
+	    
 	    if (line.hasOption(ARG_PORT))
 		arguments.setPort(Integer.parseInt(line.getOptionValue(ARG_PORT)));
 	    else
@@ -45,10 +60,11 @@ public class Application {
 	    if (line.hasOption(ARG_SERVER_OTHER))
 		arguments.setServerOther(line.getOptionValue(ARG_SERVER_CHROME));
 
+	    return arguments;
+	    
 	} catch (ParseException exp) {
-	    System.err.println("Parsing failed.  Reason: " + exp.getMessage());
+	    formatter.printHelp("help", options);
+	    throw exp;
 	}
-
-	return arguments;
     }
 }
