@@ -16,17 +16,25 @@ public class ProxyServer {
     private static final String PATH_TO_KEYSTORE = "certificate/alb.jks";
     private static final String KEYSTORE_PASSWORD = "123456";
     
-    public static void initServer(int port) throws Exception, InterruptedException {
+    public static void initServer(int port, String serverChrome, String serverOther) throws Exception, InterruptedException {
 	Server server = new Server();
 
 	ServerConnector httpsConnector = createConnectorHTTPS(server, port);
 	server.addConnector(httpsConnector);
 
-	ConnectHandler proxy = new ConnectHandler();
-	server.setHandler(proxy);
-	ServletContextHandler context = new ServletContextHandler(proxy, "/", ServletContextHandler.SESSIONS);
+	ConnectHandler connectHandler = new ConnectHandler();
+	server.setHandler(connectHandler);
+	ServletContextHandler context = new ServletContextHandler(connectHandler, "/", ServletContextHandler.SESSIONS);
 
-	ServletHolder proxyServlet = new ServletHolder(Proxy.class);
+	Proxy proxy;
+
+	if (serverChrome != null && serverOther != null) {
+	    proxy = new Proxy(serverChrome, serverOther);
+	} else {
+	    proxy = new Proxy();
+	}
+
+	ServletHolder proxyServlet = new ServletHolder(proxy);
 	context.addServlet(proxyServlet, "/*");
 
 	server.start();

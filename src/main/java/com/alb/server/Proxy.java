@@ -14,6 +14,21 @@ public class Proxy extends ProxyServlet {
     private static String DEFAULT_PROXYTO_CHROME = "http://localhost:8080";
     private static String DEFAULT_PROXYTO_OTHER = "http://localhost:8081";
 
+    private String serverChrome;
+    private String serverOther;
+    
+    public Proxy() {
+	super();
+	this.serverChrome = DEFAULT_PROXYTO_CHROME;
+	this.serverOther = DEFAULT_PROXYTO_OTHER;
+    }
+    
+    public Proxy(String serverChrome, String serverOther) {
+	super();
+	this.serverChrome = serverChrome;
+	this.serverOther = serverOther;
+    }
+    
     @Override
     protected HttpClient newHttpClient() {
 	SslContextFactory sslFactory = new SslContextFactory();
@@ -53,9 +68,9 @@ public class Proxy extends ProxyServlet {
 	String regexChromeBrowser = "Mozilla(.*)Chrome([0-9]*).*Safari\\/([0-9]*\\.([0-9])*)$";
 
 	if (userAgent.matches(regexChromeBrowser))
-	    return DEFAULT_PROXYTO_CHROME;
+	    return serverChrome;
 
-	return DEFAULT_PROXYTO_OTHER;
+	return serverOther;
     }
 
 }
