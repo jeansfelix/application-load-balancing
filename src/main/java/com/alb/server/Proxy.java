@@ -33,11 +33,10 @@ public class Proxy extends ProxyServlet {
 
     protected URI createRewrittenURI(final HttpServletRequest request, final String proxyTo) {
 	String queryString = request.getQueryString();
-
 	StringBuilder builder = new StringBuilder(proxyTo);
-
+	
 	builder.append(request.getRequestURI()).append("?").append(queryString);
-
+	
 	URI uri = URI.create(builder.toString());
 
 	return uri;
