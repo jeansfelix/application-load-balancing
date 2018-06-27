@@ -58,7 +58,7 @@ public class Application {
 		arguments.setServerChrome(line.getOptionValue(ARG_SERVER_CHROME));
 
 	    if (line.hasOption(ARG_SERVER_OTHER))
-		arguments.setServerOther(line.getOptionValue(ARG_SERVER_CHROME));
+		arguments.setServerOther(line.getOptionValue(ARG_SERVER_OTHER));
 
 	    return arguments;
 	    
