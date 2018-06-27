@@ -21,7 +21,7 @@ public class Application {
 	    Arguments arguments = treatArguments(args);
 	    
 	    if (arguments != null) {
-		ProxyServer.initServer(arguments.getPort(), arguments.getServerChrome(), arguments.getServerOther());
+		BalancerServer.initServer(arguments.getPort(), arguments.getServerChrome(), arguments.getServerOther());
 	    }
 	} catch (ParseException e) {
 	    e.printStackTrace();

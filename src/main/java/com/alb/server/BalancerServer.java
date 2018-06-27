@@ -12,7 +12,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
-public class ProxyServer {
+public class BalancerServer {
     private static final String PATH_TO_KEYSTORE = "/etc/keystore/alb.jks";
     private static final String KEYSTORE_PASSWORD = "123456";
     
@@ -26,12 +26,12 @@ public class ProxyServer {
 	server.setHandler(connectHandler);
 	ServletContextHandler context = new ServletContextHandler(connectHandler, "/", ServletContextHandler.SESSIONS);
 
-	Proxy proxy;
+	LoadBalancer proxy;
 
 	if (serverChrome != null && serverOther != null) {
-	    proxy = new Proxy(serverChrome, serverOther);
+	    proxy = new LoadBalancer(serverChrome, serverOther);
 	} else {
-	    proxy = new Proxy();
+	    proxy = new LoadBalancer();
 	}
 
 	ServletHolder proxyServlet = new ServletHolder(proxy);

@@ -8,7 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class ProxyTest {
+public class LoadBalancerTest {
     
     @Test
     public void testChooseDestination_requestFromLinuxChromeBrowser_mustBeReturnChromeServer() throws Exception {
@@ -19,7 +19,7 @@ public class ProxyTest {
 	String chromeUserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/000.00 (KHTML, like Gecko) Chrome/00.0.0000.00 Safari/000.00";
 	Mockito.when(httpServletRequest.getHeader("user-agent")).thenReturn(chromeUserAgent);
 	
-	Proxy proxy = new Proxy();
+	LoadBalancer proxy = new LoadBalancer();
 	
 	String proxyDestination = proxy.chooseDestination(httpServletRequest);
 	
@@ -35,7 +35,7 @@ public class ProxyTest {
 	String midoriUserAgent = "Mozilla/5.0 (X11; Linux) AppleWebKit/000.00 (KHTML, like Gecko) Chrome/00.0.0000.00 Safari/000.00 Midori/0.0";
 	Mockito.when(httpServletRequest.getHeader("user-agent")).thenReturn(midoriUserAgent);
 	
-	Proxy proxy = new Proxy();
+	LoadBalancer proxy = new LoadBalancer();
 	
 	String proxyDestination = proxy.chooseDestination(httpServletRequest);
 	
@@ -51,7 +51,7 @@ public class ProxyTest {
 	String midoriUserAgent = "Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:0.0.0.00) Gecko/00000000 Firefox/0.0.0.00";
 	Mockito.when(httpServletRequest.getHeader("user-agent")).thenReturn(midoriUserAgent);
 	
-	Proxy proxy = new Proxy();
+	LoadBalancer proxy = new LoadBalancer();
 	
 	String proxyDestination = proxy.chooseDestination(httpServletRequest);
 	
@@ -70,7 +70,7 @@ public class ProxyTest {
 	String requestURI = "/greeting";
 	Mockito.when(httpServletRequest.getRequestURI()).thenReturn(requestURI);
 	
-	Proxy proxy = new Proxy();
+	LoadBalancer proxy = new LoadBalancer();
 	
 	URI uri = proxy.createRewrittenURI(httpServletRequest, chromeServer);
 	
@@ -89,7 +89,7 @@ public class ProxyTest {
 	String requestURI = "";
 	Mockito.when(httpServletRequest.getRequestURI()).thenReturn(requestURI);
 	
-	Proxy proxy = new Proxy();
+	LoadBalancer proxy = new LoadBalancer();
 	
 	URI uri = proxy.createRewrittenURI(httpServletRequest, chromeServer);
 	

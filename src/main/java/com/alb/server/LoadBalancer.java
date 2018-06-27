@@ -5,10 +5,10 @@ import java.net.URI;
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.proxy.ProxyServlet;
+import org.eclipse.jetty.proxy.BalancerServlet;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
-public class Proxy extends ProxyServlet {
+public class LoadBalancer extends BalancerServlet {
     private static final long serialVersionUID = 8881768845514682064L;
     
     private static String DEFAULT_PROXYTO_CHROME = "http://localhost:8080";
@@ -17,13 +17,13 @@ public class Proxy extends ProxyServlet {
     private String serverChrome;
     private String serverOther;
     
-    public Proxy() {
+    public LoadBalancer() {
 	super();
 	this.serverChrome = DEFAULT_PROXYTO_CHROME;
 	this.serverOther = DEFAULT_PROXYTO_OTHER;
     }
     
-    public Proxy(String serverChrome, String serverOther) {
+    public LoadBalancer(String serverChrome, String serverOther) {
 	super();
 	this.serverChrome = serverChrome;
 	this.serverOther = serverOther;
@@ -47,7 +47,7 @@ public class Proxy extends ProxyServlet {
 
 	return null;
     }
-
+    
     protected URI createRewrittenURI(final HttpServletRequest request, final String proxyTo) {
 	StringBuilder builder = new StringBuilder(proxyTo);
 	
