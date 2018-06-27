@@ -7,7 +7,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import com.alb.server.util.Arguments;
+import com.alb.server.model.Arguments;
 
 public class Application {
     private static final String ARG_SERVER_OTHER = "server-other";

@@ -1,4 +1,4 @@
-package com.alb.server.util;
+package com.alb.server.model;
 
 public class Arguments {
     private int port;
