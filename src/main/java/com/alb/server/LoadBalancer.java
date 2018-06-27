@@ -10,25 +10,16 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 public class LoadBalancer extends BalancerServlet {
     private static final long serialVersionUID = 8881768845514682064L;
-    
-    private static String DEFAULT_PROXYTO_CHROME = "http://localhost:8080";
-    private static String DEFAULT_PROXYTO_OTHER = "http://localhost:8081";
 
     private String serverChrome;
     private String serverOther;
-    
-    public LoadBalancer() {
-	super();
-	this.serverChrome = DEFAULT_PROXYTO_CHROME;
-	this.serverOther = DEFAULT_PROXYTO_OTHER;
-    }
-    
+
     public LoadBalancer(String serverChrome, String serverOther) {
 	super();
 	this.serverChrome = serverChrome;
 	this.serverOther = serverOther;
     }
-    
+
     @Override
     protected HttpClient newHttpClient() {
 	SslContextFactory sslFactory = new SslContextFactory();
@@ -47,16 +38,16 @@ public class LoadBalancer extends BalancerServlet {
 
 	return null;
     }
-    
+
     protected URI createRewrittenURI(final HttpServletRequest request, final String proxyTo) {
 	StringBuilder builder = new StringBuilder(proxyTo);
-	
+
 	builder.append(request.getRequestURI());
 
 	String queryString = request.getQueryString();
-	if (queryString != null) 
+	if (queryString != null)
 	    builder.append("?").append(queryString);
-	
+
 	URI uri = URI.create(builder.toString());
 
 	return uri;

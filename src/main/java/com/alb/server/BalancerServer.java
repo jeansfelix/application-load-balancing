@@ -12,35 +12,30 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
+import com.alb.server.model.ServerConfig;
+
 public class BalancerServer {
     private static final String PATH_TO_KEYSTORE = "/etc/keystore/alb.jks";
     private static final String KEYSTORE_PASSWORD = "123456";
-    
-    public static void initServer(int port, String serverChrome, String serverOther) throws Exception, InterruptedException {
+
+    public static void initServer(ServerConfig serverConfig) throws Exception, InterruptedException {
 	Server server = new Server();
 
-	ServerConnector httpsConnector = createConnectorHTTPS(server, port);
+	ServerConnector httpsConnector = createConnectorHTTPS(server, serverConfig.getPort());
 	server.addConnector(httpsConnector);
 
 	ConnectHandler connectHandler = new ConnectHandler();
 	server.setHandler(connectHandler);
 	ServletContextHandler context = new ServletContextHandler(connectHandler, "/", ServletContextHandler.SESSIONS);
 
-	LoadBalancer proxy;
-
-	if (serverChrome != null && serverOther != null) {
-	    proxy = new LoadBalancer(serverChrome, serverOther);
-	} else {
-	    proxy = new LoadBalancer();
-	}
-
+	LoadBalancer proxy = new LoadBalancer(serverConfig.getChromeBrowserTarget(), serverConfig.getOtherBrowserTarget());
 	ServletHolder proxyServlet = new ServletHolder(proxy);
 	context.addServlet(proxyServlet, "/*");
 
 	server.start();
 	server.join();
     }
-    
+
     private static ServerConnector createConnectorHTTPS(Server server, int port) {
 	final HttpConfiguration httpConfiguration = new HttpConfiguration();
 	httpConfiguration.setSecureScheme("https");
