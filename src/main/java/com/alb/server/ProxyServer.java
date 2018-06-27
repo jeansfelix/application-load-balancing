@@ -13,7 +13,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 public class ProxyServer {
-    private static final String PATH_TO_KEYSTORE = "certificate/alb.jks";
+    private static final String PATH_TO_KEYSTORE = "/etc/keystore/alb.jks";
     private static final String KEYSTORE_PASSWORD = "123456";
     
     public static void initServer(int port, String serverChrome, String serverOther) throws Exception, InterruptedException {
