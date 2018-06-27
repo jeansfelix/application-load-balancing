@@ -7,7 +7,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import com.alb.server.model.Arguments;
+import com.alb.server.model.ServerConfig;
 
 public class Application {
     private static final String ARG_SERVER_OTHER = "server-other";
@@ -18,17 +18,17 @@ public class Application {
 
     public static void main(String... args) throws Exception {
 	try {
-	    Arguments arguments = treatArguments(args);
+	    ServerConfig arguments = treatArguments(args);
 	    
 	    if (arguments != null) {
-		BalancerServer.initServer(arguments.getPort(), arguments.getServerChrome(), arguments.getServerOther());
+		BalancerServer.initServer(arguments.getPort(), arguments.getChromeBrowserTarget(), arguments.getOtherBrowserTarget());
 	    }
 	} catch (ParseException e) {
 	    e.printStackTrace();
 	}
     }
 
-    private static Arguments treatArguments(String[] args) throws ParseException {
+    private static ServerConfig treatArguments(String[] args) throws ParseException {
 	Options options = new Options();
 	
 	options.addOption("help", "help menu");
@@ -47,7 +47,7 @@ public class Application {
 		return null;
 	    }
 
-	    Arguments arguments = new Arguments();
+	    ServerConfig arguments = new ServerConfig();
 	    
 	    if (line.hasOption(ARG_PORT))
 		arguments.setPort(Integer.parseInt(line.getOptionValue(ARG_PORT)));
@@ -55,10 +55,10 @@ public class Application {
 		arguments.setPort(DEFAULT_HTTPS_SERVER_PORT);
 
 	    if (line.hasOption(ARG_SERVER_CHROME))
-		arguments.setServerChrome(line.getOptionValue(ARG_SERVER_CHROME));
+		arguments.setChromeBrowserTarget(line.getOptionValue(ARG_SERVER_CHROME));
 
 	    if (line.hasOption(ARG_SERVER_OTHER))
-		arguments.setServerOther(line.getOptionValue(ARG_SERVER_CHROME));
+		arguments.setOtherBrowserTarget(line.getOptionValue(ARG_SERVER_OTHER));
 
 	    return arguments;
 	    
