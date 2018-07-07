@@ -15,10 +15,10 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 public class LoadBalancer extends ProxyServlet {
     private static final long serialVersionUID = 8881768845514682064L;
-    
+
     private static final List<String> REVERSE_PROXY_HEADERS;
-    static
-    {
+    
+    static {
         List<String> params = new LinkedList<String>();
         params.add("Location");
         params.add("Content-Location");
@@ -26,44 +26,43 @@ public class LoadBalancer extends ProxyServlet {
         REVERSE_PROXY_HEADERS = Collections.unmodifiableList(params);
     }
 
-
     private String serverChrome;
     private String serverOther;
-    
+
     public LoadBalancer(String serverChrome, String serverOther) {
-	super();
-	this.serverChrome = serverChrome;
-	this.serverOther = serverOther;
+        super();
+        this.serverChrome = serverChrome;
+        this.serverOther = serverOther;
     }
 
     @Override
     protected HttpClient newHttpClient() {
-	SslContextFactory sslFactory = new SslContextFactory();
-	sslFactory.setTrustAll(true);
-	return new HttpClient(sslFactory);
+        SslContextFactory sslFactory = new SslContextFactory();
+        sslFactory.setTrustAll(true);
+        return new HttpClient(sslFactory);
     }
 
     @Override
     protected String rewriteTarget(final HttpServletRequest request) {
-	final String proxyTo = chooseDestination(request);
-	final URI rewrittenURI = createRewrittenURI(request, proxyTo);
+        final String proxyTo = chooseDestination(request);
+        final URI rewrittenURI = createRewrittenURI(request, proxyTo);
 
-	if (validateDestination(rewrittenURI.getHost(), rewrittenURI.getPort())) {
-	    return rewrittenURI.toString();
-	}
+        if (validateDestination(rewrittenURI.getHost(), rewrittenURI.getPort())) {
+            return rewrittenURI.toString();
+        }
 
-	return null;
+        return null;
     }
-    
+
     @Override
-    protected String filterServerResponseHeader(HttpServletRequest request, Response serverResponse, String headerName, String headerValue) {
-	
-	if (REVERSE_PROXY_HEADERS.contains(headerName))
-        {
+    protected String filterServerResponseHeader(HttpServletRequest request, Response serverResponse, String headerName,
+            String headerValue) {
+
+        if (REVERSE_PROXY_HEADERS.contains(headerName)) {
             URI locationURI = URI.create(headerValue).normalize();
-            if (locationURI.isAbsolute() && isProxyTo(locationURI))
-            {
-                StringBuilder newURI = URIUtil.newURIBuilder(request.getScheme(), request.getServerName(), request.getServerPort());
+            if (locationURI.isAbsolute() && isProxyTo(locationURI)) {
+                StringBuilder newURI = URIUtil.newURIBuilder(request.getScheme(), request.getServerName(),
+                        request.getServerPort());
                 String component = locationURI.getRawPath();
                 if (component != null)
                     newURI.append(component);
@@ -76,54 +75,50 @@ public class LoadBalancer extends ProxyServlet {
                 return URI.create(newURI.toString()).normalize().toString();
             }
         }
-	
+
         return headerValue;
     }
 
     private boolean isProxyTo(URI locationURI) {
-	URI chromeURI = URI.create(serverChrome);
-	URI otherURI = URI.create(serverOther);
-	
-	if (chromeURI.getHost().equals(locationURI.getHost()) &&
-		chromeURI.getScheme().equals(locationURI.getScheme())
-                && chromeURI.getPort() == locationURI.getPort()) 
-	{
-	    return true;
-	}
-	
-	if (otherURI.getHost().equals(locationURI.getHost()) &&
-		otherURI.getScheme().equals(locationURI.getScheme())
-                && otherURI.getPort() == locationURI.getPort()) 
-	{
-	    return true;
-	}
-	
-	return false;
+        URI chromeURI = URI.create(serverChrome);
+        URI otherURI = URI.create(serverOther);
+
+        if (chromeURI.getHost().equals(locationURI.getHost()) && chromeURI.getScheme().equals(locationURI.getScheme())
+                && chromeURI.getPort() == locationURI.getPort()) {
+            return true;
+        }
+
+        if (otherURI.getHost().equals(locationURI.getHost()) && otherURI.getScheme().equals(locationURI.getScheme())
+                && otherURI.getPort() == locationURI.getPort()) {
+            return true;
+        }
+
+        return false;
     }
 
     protected URI createRewrittenURI(final HttpServletRequest request, final String proxyTo) {
-	StringBuilder builder = new StringBuilder(proxyTo);
+        StringBuilder builder = new StringBuilder(proxyTo);
 
-	builder.append(request.getRequestURI());
+        builder.append(request.getRequestURI());
 
-	String queryString = request.getQueryString();
-	if (queryString != null)
-	    builder.append("?").append(queryString);
+        String queryString = request.getQueryString();
+        if (queryString != null)
+            builder.append("?").append(queryString);
 
-	URI uri = URI.create(builder.toString());
+        URI uri = URI.create(builder.toString());
 
-	return uri;
+        return uri;
     }
 
     protected String chooseDestination(final HttpServletRequest request) {
-	String userAgent = request.getHeader("user-agent");
+        String userAgent = request.getHeader("user-agent");
 
-	String regexChromeBrowser = "Mozilla(.*)Chrome([0-9]*).*Safari\\/([0-9]*\\.([0-9])*)$";
+        String regexChromeBrowser = "Mozilla(.*)Chrome([0-9]*).*Safari\\/([0-9]*\\.([0-9])*)$";
 
-	if (userAgent.matches(regexChromeBrowser))
-	    return serverChrome;
+        if (userAgent.matches(regexChromeBrowser))
+            return serverChrome;
 
-	return serverOther;
+        return serverOther;
     }
 
 }

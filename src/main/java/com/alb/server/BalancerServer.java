@@ -19,39 +19,40 @@ public class BalancerServer {
     private static final String KEYSTORE_PASSWORD = "123456";
 
     public static void initServer(ServerConfig serverConfig) throws Exception, InterruptedException {
-	Server server = new Server();
+        Server server = new Server();
 
-	ServerConnector httpsConnector = createConnectorHTTPS(server, serverConfig.getPort());
-	server.addConnector(httpsConnector);
+        ServerConnector httpsConnector = createConnectorHTTPS(server, serverConfig.getPort());
+        server.addConnector(httpsConnector);
 
-	ConnectHandler connectHandler = new ConnectHandler();
-	server.setHandler(connectHandler);
-	ServletContextHandler context = new ServletContextHandler(connectHandler, "/", ServletContextHandler.SESSIONS);
+        ConnectHandler connectHandler = new ConnectHandler();
+        server.setHandler(connectHandler);
+        ServletContextHandler context = new ServletContextHandler(connectHandler, "/", ServletContextHandler.SESSIONS);
 
-	LoadBalancer proxy = new LoadBalancer(serverConfig.getChromeBrowserTarget(), serverConfig.getOtherBrowserTarget());
-	ServletHolder proxyServlet = new ServletHolder(proxy);
-	context.addServlet(proxyServlet, "/*");
+        LoadBalancer proxy = new LoadBalancer(serverConfig.getChromeBrowserTarget(),
+                serverConfig.getOtherBrowserTarget());
+        ServletHolder proxyServlet = new ServletHolder(proxy);
+        context.addServlet(proxyServlet, "/*");
 
-	server.start();
-	server.join();
+        server.start();
+        server.join();
     }
 
     private static ServerConnector createConnectorHTTPS(Server server, int port) {
-	final HttpConfiguration httpConfiguration = new HttpConfiguration();
-	httpConfiguration.setSecureScheme("https");
-	httpConfiguration.setSecurePort(port);
+        final HttpConfiguration httpConfiguration = new HttpConfiguration();
+        httpConfiguration.setSecureScheme("https");
+        httpConfiguration.setSecurePort(port);
 
-	final SslContextFactory sslContextFactory = new SslContextFactory(PATH_TO_KEYSTORE);
-	sslContextFactory.setKeyStorePassword(KEYSTORE_PASSWORD);
+        final SslContextFactory sslContextFactory = new SslContextFactory(PATH_TO_KEYSTORE);
+        sslContextFactory.setKeyStorePassword(KEYSTORE_PASSWORD);
 
-	final HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
-	httpsConfiguration.addCustomizer(new SecureRequestCustomizer());
+        final HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
+        httpsConfiguration.addCustomizer(new SecureRequestCustomizer());
 
-	final ServerConnector httpsConnector = new ServerConnector(server,
-		new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
-		new HttpConnectionFactory(httpsConfiguration));
-	httpsConnector.setPort(port);
+        final ServerConnector httpsConnector = new ServerConnector(server,
+                new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
+                new HttpConnectionFactory(httpsConfiguration));
+        httpsConnector.setPort(port);
 
-	return httpsConnector;
+        return httpsConnector;
     }
 }
